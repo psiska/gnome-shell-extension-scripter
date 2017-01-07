@@ -1,0 +1,28 @@
+pkgname=gnome-shell-extension-scripter
+_gitname=gnome-shell-scripter
+pkgver=1
+pkgrel=1
+pkgdesc="Custom script launcher for the gnome-shell"
+arch=('any')
+url="https://github.com/psiska/gnome-shell-scripter"
+license=('GPL')
+depends=('gnome-shell')
+makedepends=('git' 'intltool' 'glib2')
+source=("git${url#https}.git")
+
+pkgver() {
+  cd $_gitname
+  echo $(git rev-list --count master).$(git rev-parse --short master)
+}
+
+build() {
+  cd $_gitname
+  make
+}
+
+package() {
+  cd $_gitname
+  #make DESTDIR="$pkgdir" install
+}
+
+sha256sums=('SKIP')

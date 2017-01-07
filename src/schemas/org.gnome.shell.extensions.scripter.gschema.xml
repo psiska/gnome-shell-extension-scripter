@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist gettext-domain="gnome-shell-extension-scripter">
+  <schema path="/org/gnome/shell/extensions/scripter/" id="org.gnome.shell.extensions.scripter">
+    <key type="a{s(sb)}" name="scripts">
+      <default>{}</default>
+      <summary>Script list</summary>
+    </key>
+    <key type="b" name="show-notification">
+      <default>true</default>
+      <summary>Show Notification</summary>
+    </key>
+    <key type="i" name="refresh-interval">
+        <default>5000</default>
+        <summary>How often check for a status</summary>
+    </key>
+  </schema>
+</schemalist>
+

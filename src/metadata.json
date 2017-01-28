@@ -1,10 +1,11 @@
 {
   "shell-version": ["3.18", "3.20", "3.22"],
   "uuid": "scripter@psiska.github.com",
+  "extensions-id": "scripter",
   "name": "Scripter",
   "description": "Add custom script to execute them via click. Use scripts to monitor system.",
   "settings-schema": "org.gnome.shell.extensions.scripter",
   "gettext-domain": "scripter",
-  "url": "https://github.com/psiska/gnome-shell-extension-scripter"
+  "url": "https://github.com/psiska/gnome-shell-extension-scripter",
+  "version": 1
 }
-

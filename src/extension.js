@@ -84,29 +84,33 @@ const Scripter = new Lang.Class({
 
     let list = this._settings.get_value(Utils.SCRIPTER_SCRIPTS_KEY).unpack();
     for (let scriptname in list) {
-      let menuItem = new PopupScriptMenuItem(scriptname);
-      menuItem.connect('activate', Lang.bind(this, function() {
-        let script = list[scriptname].get_child_value(0).unpack();
-        let sudo = list[scriptname].get_child_value(1).unpack();
+      let sname = scriptname;
+      let menuItem = new PopupScriptMenuItem(sname);
+      let script = list[sname].get_child_value(0).unpack();
+      let sudo = list[sname].get_child_value(1).unpack();
 
-        this._runScript(scriptname, script, sudo);
+      menuItem.connect('activate', Lang.bind(this, function() {
+        this._runScript(sname, script, sudo);
       }));
+
       this.scriptItemCont.addMenuItem(menuItem);
+      menuItem = null;
     }
   },
   _runScript: function (sScriptName, sScript, bSudo) {
+    global.log("Scripter executing scriptName: '" + sScriptName + "' script: '" + sScript + "' sudo: " + bSudo);
     let result;
     if (bSudo) {
       sScript = "gksudo " + sScript;
       result = SystemUtils.spawn(sScript.split(" "));
     } else {
       result = SystemUtils.spawn(sScript.split(" "));
-    } 
+    }
     if (result) {
       this._showNotification(_("Script") + " \"" + sScriptName + "\" " + _("completed."));
     } else {
       this._showNotification(_("Script") + " \"" + sScriptName + "\" " + _("failed."));
-    } 
+    }
   },
   _showNotification: function(subject, text) {
     let source = new MessageTray.Source(_("Scripter applet"), 'utilities-scripter');

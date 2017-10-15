@@ -1,7 +1,7 @@
 const Gdk     = imports.gi.Gdk;
 const GLib    = imports.gi.GLib;
 const Gio     = imports.gi.Gio;
-const St      = imports.gi.St;
+//const St      = imports.gi.St;
 const Clutter = imports.gi.Clutter;
 
 const Lang    = imports.lang;

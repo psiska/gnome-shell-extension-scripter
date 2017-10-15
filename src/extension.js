@@ -99,18 +99,13 @@ const Scripter = new Lang.Class({
   },
   _runScript: function (sScriptName, sScript, bSudo) {
     global.log("Scripter executing scriptName: '" + sScriptName + "' script: '" + sScript + "' sudo: " + bSudo);
-    let result;
     if (bSudo) {
       sScript = "gksudo " + sScript;
-      result = SystemUtils.spawn(sScript.split(" "));
+      SystemUtils.spawn(sScript.split(" "));
     } else {
-      result = SystemUtils.spawn(sScript.split(" "));
+      SystemUtils.spawn(sScript.split(" "));
     }
-    if (result) {
-      this._showNotification(_("Script") + " \"" + sScriptName + "\" " + _("completed."));
-    } else {
-      this._showNotification(_("Script") + " \"" + sScriptName + "\" " + _("failed."));
-    }
+    this._showNotification(_("Script") + " \"" + sScriptName + "\" " + _("completed."));
   },
   _showNotification: function(subject, text) {
     let source = new MessageTray.Source(_("Scripter applet"), 'utilities-scripter');

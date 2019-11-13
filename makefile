@@ -10,5 +10,5 @@ release:
 
 localinstall:
 	mkdir -p $(INSTALLPATH)
-	cp -r * $(INSTALLPATH)
+	cp -r src/* $(INSTALLPATH)
 

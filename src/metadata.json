@@ -1,7 +1,6 @@
 {
-  "shell-version": ["3.18", "3.20", "3.22", "3.24"],
+  "shell-version": ["3.28", "3.30", "3.32", "3.34" ],
   "uuid": "scripter@psiska.github.com",
-  "extensions-id": "scripter",
   "name": "Scripter",
   "description": "Add custom script to execute them via click. Use scripts to monitor system.",
   "settings-schema": "org.gnome.shell.extensions.scripter",

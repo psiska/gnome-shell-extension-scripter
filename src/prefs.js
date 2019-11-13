@@ -82,15 +82,17 @@ const ScripterPrefsWdiget = new Lang.Class({
     this.treeview.append_column(scriptpath);
 
     let scriptsudo = new Gtk.TreeViewColumn({ title: _("Sudo"), min_width: 100 });
-    let togrenderer = new Gtk.CellRendererToggle({ radio: false });
+    let togrenderer = new Gtk.CellRendererToggle({ radio: false, activatable: true });
     togrenderer.connect("toggled", Lang.bind(this, function(renderer, pathString) {
+      global.log('Toggle button toggled: ' + pathString);
       let [store, iter] = this._scriptlist.get_iter(Gtk.TreePath.new_from_string(pathString));
+      global.log('Toogle button iter: ' + iter);
+      global.log('Toggle button state: ' + renderer.active);
       this._scriptlist.set(iter, [Columns.SCRIPT_SUDO], [!renderer.active]);
     }));
     scriptsudo.pack_start(togrenderer, true);
     scriptsudo.add_attribute(togrenderer, "active", Columns.SCRIPT_SUDO);
     this.treeview.append_column(scriptsudo);
-    
 
     this.toolbar = new Gtk.Toolbar({ icon_size: 1 });
     this.toolbar.get_style_context().add_class("inline-toolbar");
@@ -108,6 +110,7 @@ const ScripterPrefsWdiget = new Lang.Class({
       return;
 
     let list = this._settings.get_value(Utils.SCRIPTER_SCRIPTS_KEY).unpack();
+
     // stop everyone from reacting to the changes we are about to produce in the model
     this._inhibitUpdate = true;
     this._scriptlist.clear();
@@ -115,6 +118,7 @@ const ScripterPrefsWdiget = new Lang.Class({
       // format a{s(sb)}
       let script = list[scriptName].get_child_value(0).unpack();
       let sudo = list[scriptName].get_child_value(1).unpack();
+
       this._scriptlist.set(this._scriptlist.append(),
         [Columns.SCRIPT_NAME, Columns.SCRIPT_PATH, Columns.SCRIPT_SUDO],
         [scriptName, script, sudo]);

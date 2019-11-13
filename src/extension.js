@@ -1,11 +1,6 @@
-const Gdk = imports.gi.Gdk;
-const Gio = imports.gi.Gio;
-const GLib = imports.gi.GLib;
+const { GObject, Shell, St, Clutter } = imports.gi;
 const Lang = imports.lang;
 const Mainloop = imports.mainloop; // timer
-const Shell = imports.gi.Shell;
-const St = imports.gi.St;
-const Clutter = imports.gi.Clutter;
 const Layout = imports.ui.layout;
 const FileUtils = imports.misc.fileUtils;
 const SystemUtils = imports.misc.util;
@@ -18,51 +13,50 @@ const Panel = imports.ui.panel;
 
 
 const Gettext = imports.gettext;
+const _ = Gettext.gettext;
+
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 const Utils = Me.imports.utils;
 
-
-Utils.initTranslations();
-const _ = Gettext.gettext;
 const N_ = function(e) { return e; };
 
-const  PopupScriptMenuItem = new Lang.Class({
-  Name: 'PopupScriptMenuItem',
-  Extends: PopupMenu.PopupBaseMenuItem,
+class PopupScriptMenuItem extends PopupMenu.PopupBaseMenuItem {
 
-  _init: function(sScriptName, params) {
-    this.parent(params);
+  constructor(sScriptName) {
+    super();
 
-    this.scriptname = new St.Label({ text: sScriptName });
-    if (this.actor instanceof St.BoxLayout) {
-      this.actor.add(this.scriptname, { expand: true });
-    } else {
-      this.addActor(this.scriptname, { expand: true });
-    }
+    this.label = new St.Label({ text: sScriptName });
+    this.actor.add(this.label, { expand: true });
+    this.actor.label_actor = this.label;
   }
-});
+
+  destroy() {
+    super.destroy();
+  }
+};
 
 
-const Scripter = new Lang.Class({
-  Name: 'Scripter',
-  Extends: PanelMenu.Button,
-  _init: function() {
-    this.parent(0.0, 'Scripter');
+let Scripter = GObject.registerClass(
+class Scripter extends PanelMenu.Button {
+  _init() {
+    super._init(0.0, 'Scripter');
 
     this._settings = Utils.getSettings();
-    this._logo = new St.Icon({
+
+    let _logo = new St.Icon({
       icon_name: 'content-loading-symbolic',
       style_class: 'system-status-icon',
       reactive: true,
       track_hover: true
     });
 
-    this.actor.add_actor(this._logo);
+    this.actor.add_actor(_logo);
 
     this._createMenu();
-  },
-  _createMenu: function() {
+  }
+
+  _createMenu() {
     this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
     this._settings.connect("changed::" + Utils.SCRIPTER_SCRIPTS_KEY,
                            Lang.bind(this, this._updateScriptList));
@@ -78,8 +72,9 @@ const Scripter = new Lang.Class({
     this.menu.addMenuItem(this.scriptItemCont);
  
     this._updateScriptList();
-  },
-  _updateScriptList: function(config, output) {
+  }
+
+  _updateScriptList(config, output) {
     this.scriptItemCont.removeAll();
 
     let list = this._settings.get_value(Utils.SCRIPTER_SCRIPTS_KEY).unpack();
@@ -96,8 +91,9 @@ const Scripter = new Lang.Class({
       this.scriptItemCont.addMenuItem(menuItem);
       menuItem = null;
     }
-  },
-  _runScript: function (sScriptName, sScript, bSudo) {
+  }
+
+  _runScript(sScriptName, sScript, bSudo) {
     global.log("Scripter executing scriptName: '" + sScriptName + "' script: '" + sScript + "' sudo: " + bSudo);
     if (bSudo) {
       sScript = "gksudo " + sScript;
@@ -106,8 +102,9 @@ const Scripter = new Lang.Class({
       SystemUtils.spawn(sScript.split(" "));
     }
     this._showNotification(_("Script") + " \"" + sScriptName + "\" " + _("completed."));
-  },
-  _showNotification: function(subject, text) {
+  }
+
+  _showNotification(subject, text) {
     let source = new MessageTray.Source(_("Scripter applet"), 'utilities-scripter');
 
     Main.messageTray.add(source);
@@ -115,8 +112,9 @@ const Scripter = new Lang.Class({
     let notification = new MessageTray.Notification(source, subject, text);
     notification.setTransient(true);
     source.notify(notification);
-  },
-  _showPreferences: function() {
+  }
+
+  _showPreferences() {
     SystemUtils.spawn(["gnome-shell-extension-prefs", Me.metadata['uuid']]);
     return 0;
   }
@@ -124,18 +122,19 @@ const Scripter = new Lang.Class({
 
 // Init function
 function init(metadata){ 
+
+  Utils.initTranslations();
   let theme = imports.gi.Gtk.IconTheme.get_default();
   theme.append_search_path(metadata.path);
 }
 
 let _Scripter;
 
-
-function enable(){
+function enable() {
   _Scripter = new Scripter();
   Main.panel.addToStatusArea('scripter', _Scripter);
 }
 
-function disable(){
+function disable() {
   _Scripter.destroy();
 }

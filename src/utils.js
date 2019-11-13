@@ -8,7 +8,7 @@ const Me             = ExtensionUtils.getCurrentExtension();
 const Config         = imports.misc.config;
 
 
-const SCRIPTER_SCRIPTS_KEY = 'scripts';
+var SCRIPTER_SCRIPTS_KEY = 'scripts';
 
 
 function initTranslations(domain) {
@@ -22,10 +22,11 @@ function initTranslations(domain) {
 }
 
 function getSettings(schema) {
-  schema = schema || Me.metadata['settings-schema'];
+  let extension = ExtensionUtils.getCurrentExtension();
+  schema = schema || extension.metadata['settings-schema'];
   const GioSSS = Gio.SettingsSchemaSource;
 
-  let schemaDir = Me.dir.get_child('schemas');
+  let schemaDir = extension.dir.get_child('schemas');
   let schemaSource;
   if (schemaDir.query_exists(null)) {
     schemaSource = GioSSS.new_from_directory(schemaDir.get_path(),
@@ -56,7 +57,7 @@ function debug_out(obj, indent) {
   if (indent == null) indent = "";
   
   for (let property in obj)
-  { 
+  {
     let value = obj[property];
     if (typeof value == 'string')
       value = "'" + value + "'";
@@ -68,7 +69,7 @@ function debug_out(obj, indent) {
         value = "[ " + value + " ]";
       }
       else
-      { 
+      {
         // Recursive dump
         // (replace "  " by "\t" or something else if you prefer)
         let od = debug_out(value, indent + "  ");

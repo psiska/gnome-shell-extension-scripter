@@ -1,5 +1,5 @@
 {
-  "shell-version": ["3.28", "3.30", "3.32", "3.34" ],
+  "shell-version": ["3.34", "3.36" ],
   "uuid": "scripter@psiska.github.com",
   "name": "Scripter",
   "description": "Add custom script to execute them via click. Use scripts to monitor system.",

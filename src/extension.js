@@ -21,26 +21,16 @@ const Utils = Me.imports.utils;
 
 const N_ = function(e) { return e; };
 
-class PopupScriptMenuItem extends PopupMenu.PopupBaseMenuItem {
+const IndicatorName = 'Scripter';
 
-  constructor(sScriptName) {
-    super();
+let scripterIndicator=null;
+let init_called=false;
 
-    this.label = new St.Label({ text: sScriptName });
-    this.actor.add(this.label, { expand: true });
-    this.actor.label_actor = this.label;
-  }
-
-  destroy() {
-    super.destroy();
-  }
-};
-
-
-let Scripter = GObject.registerClass(
-class Scripter extends PanelMenu.Button {
-  _init() {
-    super._init(0.0, 'Scripter');
+const ScripterIndicator = new Lang.Class({
+  Name: IndicatorName,
+  Extends: PanelMenu.Button,
+  _init: function() {
+    this.parent(0.0, IndicatorName);
 
     this._settings = Utils.getSettings();
 
@@ -51,12 +41,12 @@ class Scripter extends PanelMenu.Button {
       track_hover: true
     });
 
-    this.actor.add_actor(_logo);
+    this.add_child(_logo);
 
     this._createMenu();
-  }
+  },
 
-  _createMenu() {
+  _createMenu: function() {
     this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
     this._settings.connect("changed::" + Utils.SCRIPTER_SCRIPTS_KEY,
                            Lang.bind(this, this._updateScriptList));
@@ -72,15 +62,15 @@ class Scripter extends PanelMenu.Button {
     this.menu.addMenuItem(this.scriptItemCont);
  
     this._updateScriptList();
-  }
+  },
 
-  _updateScriptList(config, output) {
+  _updateScriptList: function(config, output) {
     this.scriptItemCont.removeAll();
 
     let list = this._settings.get_value(Utils.SCRIPTER_SCRIPTS_KEY).unpack();
     for (let scriptname in list) {
       let sname = scriptname;
-      let menuItem = new PopupScriptMenuItem(sname);
+      let menuItem = new PopupMenu.PopupMenuItem(sname);
       let script = list[sname].get_child_value(0).unpack();
       let sudo = list[sname].get_child_value(1).unpack();
 
@@ -91,9 +81,9 @@ class Scripter extends PanelMenu.Button {
       this.scriptItemCont.addMenuItem(menuItem);
       menuItem = null;
     }
-  }
+  },
 
-  _runScript(sScriptName, sScript, bSudo) {
+  _runScript: function(sScriptName, sScript, bSudo) {
     global.log("Scripter executing scriptName: '" + sScriptName + "' script: '" + sScript + "' sudo: " + bSudo);
     if (bSudo) {
       sScript = "gksudo " + sScript;
@@ -102,9 +92,9 @@ class Scripter extends PanelMenu.Button {
       SystemUtils.spawn(sScript.split(" "));
     }
     this._showNotification(_("Script") + " \"" + sScriptName + "\" " + _("completed."));
-  }
+  },
 
-  _showNotification(subject, text) {
+  _showNotification: function(subject, text) {
     let source = new MessageTray.Source(_("Scripter applet"), 'utilities-scripter');
 
     Main.messageTray.add(source);
@@ -112,9 +102,9 @@ class Scripter extends PanelMenu.Button {
     let notification = new MessageTray.Notification(source, subject, text);
     notification.setTransient(true);
     source.notify(notification);
-  }
+  },
 
-  _showPreferences() {
+  _showPreferences: function() {
     SystemUtils.spawn(["gnome-shell-extension-prefs", Me.metadata['uuid']]);
     return 0;
   }
@@ -122,19 +112,24 @@ class Scripter extends PanelMenu.Button {
 
 // Init function
 function init(metadata){ 
+  if (init_called === false) {
+    Utils.initTranslations();
+    init_called = true;
+  } else {
+    log("WARNING: init() called more than once, ignoring");
+  }
 
-  Utils.initTranslations();
-  let theme = imports.gi.Gtk.IconTheme.get_default();
-  theme.append_search_path(metadata.path);
+	//let theme = imports.gi.Gtk.IconTheme.get_default();
+//   theme.append_search_path(metadata.path);
 }
 
-let _Scripter;
-
 function enable() {
-  _Scripter = new Scripter();
-  Main.panel.addToStatusArea('scripter', _Scripter);
+  scripterIndicator = new ScripterIndicator();
+  Main.panel.addToStatusArea(IndicatorName, scripterIndicator);
 }
 
 function disable() {
+  scipterIndicator.destroy();
   _Scripter.destroy();
+  scripterIndicator = null;
 }
